@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import './style.css'
+import './assets/styles.css'
 import App from './App.vue'
 import Modals from './plugins/modals'
 
