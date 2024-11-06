@@ -1,16 +1,25 @@
 <script setup>
 
-import { inject, ref } from 'vue';
-import ToDoSummary from './ToDoSummary.vue';
-import ToDoFilter from './ToDoFilter.vue';
-import ToDoList from './ToDoList.vue';
-import ToDoItemForm from './ToDoItemForm.vue'
-import todoService from '../services/todo'
+import { inject, ref, watch, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import ToDoSummary from '../components/ToDoSummary.vue';
+import ToDoFilter from '../components/ToDoFilter.vue';
+import ToDoList from '../components/ToDoList.vue';
+import ToDoItemForm from '../components/ToDoItemForm.vue';
+import todoService from '../services/todo';
+import eventBus from "../services/eventBus"
 
 const _items = ref([]),
 _item = ref({}),
 _filter = ref(''),
-$modals = inject('$modals')
+$modals = inject('$modals'),
+$props = defineProps(["id"]),
+$router = useRouter(),
+_project_name=ref("")
+
+onMounted(loadProject)
+
+watch(()=>$props.id, loadProject)
 
 function showModal(new_item = true, item = {}) {
     if(new_item){
@@ -30,6 +39,7 @@ function showModal(new_item = true, item = {}) {
                 alert('Error updating this item')
             }
         }
+        saveProject()
     }, () => {
         // Обработка отмены
     })
@@ -40,7 +50,9 @@ function deleteItem(item){
         let index = getIndex(item)
         if(index >= 0){
             _items.value.splice(index, 1)
+            saveProject()
         }
+        
     }, () => {
         // Обработка отмены
     })
@@ -59,6 +71,28 @@ function getIndex(item){
 
 function toggleStatus(item){
     item.status=todoService.toggleStatus(item.status)
+    saveProject()
+}
+
+function deleteProject(){
+    $modals.show("deleteProject").then(()=>{
+        // удаление проекта
+        todoService.deleteProject($props.id)
+        eventBus.emit("#UpdateProjects")
+        $router.push({name:"landing"})
+    },()=>{})
+}
+
+function loadProject(){
+    // Имя проекта
+    _project_name.value=todoService.getProjectName($props.id)
+
+    // Items
+    _items.value=todoService.loadProject($props.id)
+}
+
+function saveProject(){
+    todoService.saveProject($props.id, _items.value)
 }
 
 

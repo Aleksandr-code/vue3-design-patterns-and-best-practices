@@ -1,12 +1,13 @@
 <script setup>
-  import MainHeader from "@components/headers/MainHeader.vue"
-  import ToDoProject from "@components/ToDoProject.vue"
+  import SideBar from './components/Sidebar/Sidebar.vue'
 </script>
 
 <template>
-  <div class="app w3-light-gray">
-    <MainHeader/>
-    <ToDoProject/>
+  <div class="app">
+    <SideBar></SideBar>
+    <main>
+      <router-view></router-view>
+    </main>
   </div>
 </template>
 
@@ -15,5 +16,12 @@
   width: 100vw;
   min-height: 100vh;
   padding: 0;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 12rem auto;
+}
+
+main{
+    overflow: hidden auto;
 }
 </style>
